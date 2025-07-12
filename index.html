@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>御書堂書店 - 參考書版本查詢系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #ede0d3 100%);
+            min-height: 100vh;
+            color: #3d2914;
+            padding: 10px 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 6s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 1.4em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+
+        }
+        .warning{
+            margin: 10px;
+            background-color: #f0e4c1;
+        }
+
+        .nav-button {
+            flex: 1;
+            max-width: 500px;
+            height: 220px;
+            background: linear-gradient(135deg, #deb887 0%, #d2b48c 100%);
+            border: none;
+            border-radius: 25px;
+            color: #3d2914;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 12px 30px rgba(139, 69, 19, 0.25);
+            border: 4px solid #8b4513;
+            position: relative;
+            overflow: hidden;
+            padding: 10px 20px;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-button:hover::before {
+            left: 100%;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(139, 69, 19, 0.4);
+            background: linear-gradient(135deg, #f0e4c1 0%, #e6d4a7 100%);
+        }
+
+        .nav-button:active {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .button-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #8b4513;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.1);
+            border: 2px solid #d2b48c;
+        }
+
+        .footer h3 {
+            color: #5d4037;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .footer p {
+            color: #3d2914;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .features-list {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .feature-item {
+            flex: 1;
+            min-width: 200px;
+            background: #f7f3ef;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #8b4513;
+        }
+
+        .feature-item h4 {
+            color: #5d4037;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .feature-item p {
+            color: #3d2914;
+            font-size: 0.95em;
+        }
+
+        /* 手機響應式設計 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                margin-bottom: 40px;
+                padding: 30px 15px;
+            }
+
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .header p {
+                font-size: 1.2em;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .nav-button {
+                max-width: 100%;
+                height: 160px;
+                font-size: 1.5em;
+            }
+
+            .button-icon {
+                font-size: 2em;
+                margin-bottom: 10px;
+            }
+
+            .button-text {
+                font-size: 1.1em;
+            }
+
+            .footer {
+                margin-top: 40px;
+                padding: 20px;
+            }
+
+            .features-list {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .feature-item {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 1.1em;
+            }
+
+            .nav-button {
+                height: 140px;
+                font-size: 1.3em;
+            }
+
+            .button-icon {
+                font-size: 1.8em;
+            }
+
+            .button-text {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>御書堂書店</h1>
+                <p>國中小參考書版本查詢系統</p>
+                <div class="subtitle">快速查詢各校使用的教科書版本</div>
+            </div>
+        </div>
+        <div class="warning">
+            <p>
+                ※參考書並未完全到貨，如有購買需求<br>可以先洽工作人員預先訂購※
+                <br> (預計 7/20 陸續到貨)
+            </p>
+        </div>
+        <div class="button-container">
+            <a href="/elementary/" class="nav-button">
+                <div class="button-text">國小版本查詢</div>
+            </a>
+            
+            <a href="/junior/" class="nav-button">
+                <div class="button-text">國中版本查詢</div>
+            </a>
+        </div>
+
+
+    </div>
+</body>
+</html>

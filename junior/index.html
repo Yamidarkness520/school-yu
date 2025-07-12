@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>御書堂書店 - 國中參考書版本查詢系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #ede0d3 100%);
+            min-height: 100vh;
+            color: #3d2914;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .query-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(139, 69, 19, 0.1);
+            margin-bottom: 30px;
+            border: 2px solid #d2b48c;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #5d4037;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d2b48c;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            color: #3d2914;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #8b4513;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(139, 69, 19, 0.1);
+            border: 2px solid #d2b48c;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #5d4037;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d2b48c;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 18px 25px;
+            text-align: left;
+            border-bottom: 2px solid #d2b48c;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .results-table th {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .results-table th:first-child {
+            width: 40%;
+        }
+
+        .results-table th:last-child {
+            width: 60%;
+        }
+
+        .results-table td {
+            font-weight: 500;
+            color: #3d2914;
+        }
+
+        .results-table td:first-child {
+            background-color: #f7f3ef;
+            font-weight: 600;
+            color: #5d4037;
+            border-right: 2px solid #d2b48c;
+        }
+
+        .results-table td:last-child {
+            background-color: white;
+            font-weight: 700;
+            color: #8b4513;
+            font-size: 17px;
+        }
+
+        .results-table tr:hover td {
+            background-color: #f0e6d6 !important;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grade-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .grade-table th,
+        .grade-table td {
+            padding: 5px 30px;
+            text-align: center;
+            border-bottom: 2px solid #d2b48c;
+            font-size: 16px;
+        }
+
+        .grade-table th {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .grade-table td {
+            font-weight: 500;
+            color: #3d2914;
+        }
+
+        .grade-table td:first-child {
+            background-color: #f7f3ef;
+            font-weight: 600;
+            color: #5d4037;
+            border-right: 2px solid #d2b48c;
+        }
+
+        .grade-table td:last-child {
+            background-color: white;
+            font-weight: 700;
+            color: #8b4513;
+            font-size: 17px;
+        }
+
+        .grade-table tr:hover td {
+            background-color: #f0e6d6 !important;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        .grade-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #8b4513;
+            font-size: 1.2em;
+        }
+
+        .selection-info {
+            background: linear-gradient(135deg, #deb887 0%, #d2b48c 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #8b4513;
+        }
+
+        .selection-info h3 {
+            color: #5d4037;
+            margin-bottom: 5px;
+        }
+
+        .selection-info p {
+            color: #3d2914;
+            font-size: 1.1em;
+        }
+        .center{
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            color: #3d2914;;
+        }
+        ol{
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .results-table {
+                font-size: 14px;
+            }
+
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>御書堂書店</h1>
+            <p>國中參考書版本查詢系統</p>
+        </div>
+
+        <div class="query-section">
+            <div class="results-title">國中版本查詢</div>
+            <div class="center">若要查詢國小版本請按[<a href="/elementary/">這裡</a>]</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="region">地區：</label>
+                    <select id="region">
+                        <option value="">請選擇地區</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="school">學校：</label>
+                    <select id="school" disabled>
+                        <option value="">請先選擇地區</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="grade">年級：</label>
+                    <select id="grade" disabled>
+                        <option value="">請先選擇學校</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section" id="results">
+            <div class="selection-info">
+                <h3>查詢結果</h3>
+                <p id="selection-display"></p>
+            </div>
+            <div class="results-title">教科書版本資訊</div>
+            <table class="results-table" id="results-table">
+                <thead>
+                    <tr>
+                        <th>科目</th>
+                        <th>版本</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                </tbody>
+            </table>
+            <div class="no-results" id="no-results" style="display: none;">
+                找不到相關資料，請確認選擇的地區、學校和年級資訊。
+            </div>
+            <br>
+            <div class="results-title">貼心提醒</div>
+            <ol>
+                <li> 國中參考書皆以"冊數"編列，非以"年級"編列，請按照下表選購正確冊數。 </li>
+               <table class="grade-table" id="grade-table">
+                <thead>
+                    <tr>
+                        <th>年級</th>
+                        <th>冊數</th>
+                    </tr>
+                </thead>
+                <tbody id="grade-body">
+                    <tr><td>一年級上</td><td>冊 1</td></tr>
+                    <tr><td>二年級上</td><td>冊 3</td></tr>
+                    <tr><td>三年級上</td><td>冊 5</td></tr>
+                </tbody>
+            </table>
+                <li> 若找不到所需的書籍，可洽服務人員協助尋書或訂購。 </li> 
+                <li> 請再次確認版本是否與學校版本相符合，若參考書經過書寫或人為折損，不可退換貨。 </li>    
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 學校資料變數
+        let schoolData = {};
+
+        // 載入JSON資料
+        async function loadSchoolData() {
+            console.log('開始載入學校資料...');
+            try {
+                console.log('嘗試讀取 ./data.json');
+                const response = await fetch('./data.json');
+                console.log('Response 狀態:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const jsonData = await response.json();
+                console.log('成功載入資料:', jsonData);
+                schoolData = jsonData;
+                initializeRegions();
+            } catch (error) {
+                console.error('載入資料時發生錯誤:', error);
+              
+                // 顯示提示訊息
+                showLoadingMessage();
+                initializeRegions();
+            }
+        }
+
+        // 顯示載入訊息
+        function showLoadingMessage() {
+            const header = document.querySelector('.header');
+            const notice = document.createElement('div');
+            notice.style.cssText = `
+                background: #ff6b35;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 15px;
+                font-size: 14px;
+                text-align: center;
+            `;
+            notice.innerHTML = `
+                <strong>提示：</strong> 目前服務異常。
+                <br>如需要版本資訊，請洽服務人員或撥：(03)480-3901，由服務人員為您查詢。
+            `;
+            header.appendChild(notice);
+        }
+
+        // 獲取DOM元素
+        const regionSelect = document.getElementById('region');
+        const schoolSelect = document.getElementById('school');
+        const gradeSelect = document.getElementById('grade');
+        const resultsSection = document.getElementById('results');
+        const resultsTable = document.getElementById('results-table');
+        const resultsBody = document.getElementById('results-body');
+        const noResults = document.getElementById('no-results');
+        const selectionDisplay = document.getElementById('selection-display');
+
+        // 初始化地區選項
+        function initializeRegions() {
+            Object.keys(schoolData).forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionSelect.appendChild(option);
+            });
+            
+            // 設置龍潭區為預設選項
+            regionSelect.value = '龍潭區';
+            updateSchools();
+        }
+
+        // 更新學校選項
+        function updateSchools() {
+            const selectedRegion = regionSelect.value;
+            
+            // 清空學校選項
+            schoolSelect.innerHTML = '<option value="">請選擇學校</option>';
+            gradeSelect.innerHTML = '<option value="">請先選擇學校</option>';
+            
+            if (selectedRegion && schoolData[selectedRegion]) {
+                schoolSelect.disabled = false;
+                Object.keys(schoolData[selectedRegion]).forEach(school => {
+                    const option = document.createElement('option');
+                    option.value = school;
+                    option.textContent = school;
+                    schoolSelect.appendChild(option);
+                });
+            } else {
+                schoolSelect.disabled = true;
+                gradeSelect.disabled = true;
+            }
+            
+            hideResults();
+        }
+
+        // 更新年級選項
+        function updateGrades() {
+            const selectedRegion = regionSelect.value;
+            const selectedSchool = schoolSelect.value;
+            
+            // 清空年級選項
+            gradeSelect.innerHTML = '<option value="">請選擇年級</option>';
+            
+            if (selectedRegion && selectedSchool && schoolData[selectedRegion][selectedSchool]) {
+                gradeSelect.disabled = false;
+                Object.keys(schoolData[selectedRegion][selectedSchool]).forEach(grade => {
+                    const option = document.createElement('option');
+                    option.value = grade;
+                    option.textContent = grade;
+                    gradeSelect.appendChild(option);
+                });
+            } else {
+                gradeSelect.disabled = true;
+            }
+            
+            hideResults();
+        }
+
+        // 顯示結果
+        function showResults() {
+            const selectedRegion = regionSelect.value;
+            const selectedSchool = schoolSelect.value;
+            const selectedGrade = gradeSelect.value;
+            
+            if (selectedRegion && selectedSchool && selectedGrade) {
+                const subjects = schoolData[selectedRegion][selectedSchool][selectedGrade];
+                
+                if (subjects && Object.keys(subjects).length > 0) {
+                    // 更新選擇資訊顯示
+                    selectionDisplay.textContent = `${selectedRegion} ${selectedSchool} ${selectedGrade}`;
+                    
+                    // 清空表格
+                    resultsBody.innerHTML = '';
+                    
+                    // 添加科目和版本到表格
+                    Object.entries(subjects).forEach(([subject, version]) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${subject}</td>
+                            <td>${version}</td>
+                        `;
+                        resultsBody.appendChild(row);
+                    });
+                    
+                    // 顯示結果
+                    resultsTable.style.display = 'table';
+                    noResults.style.display = 'none';
+                    resultsSection.classList.add('active');
+                      // 平滑滾動到結果區域
+                    setTimeout(() => {
+                        resultsSection.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
+                    }, 100);
+                } else {
+                    showNoResults();
+                }
+            } else {
+                hideResults();
+            }
+        }
+
+        // 顯示無結果
+        function showNoResults() {
+            resultsTable.style.display = 'none';
+            noResults.style.display = 'block';
+            resultsSection.classList.add('active');
+        }
+
+        // 隱藏結果
+        function hideResults() {
+            resultsSection.classList.remove('active');
+        }
+
+        // 事件監聽器
+        regionSelect.addEventListener('change', updateSchools);
+        schoolSelect.addEventListener('change', updateGrades);
+        gradeSelect.addEventListener('change', showResults);
+
+        // 初始化
+        loadSchoolData();
+   
+        document.getElementById('header').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
